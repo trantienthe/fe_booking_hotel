@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="relative">
+    <div className="relative  mr-16 ml-16">
       <Header />
       <main>{children}</main>
       <Footer />
