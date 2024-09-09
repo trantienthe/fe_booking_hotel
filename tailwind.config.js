@@ -13,6 +13,7 @@ module.exports = {
         sm0: { max: '400px' },
         sm: { max: '850px' },
         md: { max: '1100px' },
+        md1: { max: '1600px' },
         xl: { max: '2200px' },
       },
     },
