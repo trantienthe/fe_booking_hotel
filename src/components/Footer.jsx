@@ -5,9 +5,9 @@ import { FaSquareInstagram } from 'react-icons/fa6';
 
 const Footer = () => {
   return (
-    <div className="grid grid-cols-4 text-white bg-[#101828] px-[80px] py-10 md:grid-cols-2 sm:flex sm:flex-col sm:px-[10px]">
+    <div className="text-white bg-[#101828] px-[80px] py-10 md:grid sm:grid-cols-2 md:grid-cols-4">
       <div className="text-[16px] md:text-[14px] sm:text-[13px] md1:mt-5">
-        <img src="./images/logodep.jpg" alt="" className="w-[50px] h-[50px]" />
+        <img src="./images/logohavenhotel.png" alt="" className="w-[150px] h-[100px] bg-white" />
         <div className="mt-2">Công ty TNHH Du Lịch và Dịch Vụ</div>
         <div className="mt-2">Đà Nẵng</div>
         <div className="mt-2">Mã số doanh nghiệp: 2002</div>
@@ -36,13 +36,13 @@ const Footer = () => {
         <h2 className="text-[16px] text-[#5e6780] font-semibold">THEO DÕI CHÚNG TÔI</h2>
         <ul className="flex gap-5">
           <li className="mt-2">
-            <FaFacebookSquare className="w-[20px] h-[20px] hover:bg-[#98a2ae]" />
+            <FaFacebookSquare className="w-[20px] h-[20px] hover:bg-[#98a2ae] " />
           </li>
           <li className="mt-2">
-            <FaSquareInstagram className="w-[20px] h-[20px] hover:bg-[#98a2ae]" />
+            <FaSquareInstagram className="w-[20px] h-[20px] hover:bg-[#98a2ae] " />
           </li>
           <li className="mt-2">
-            <CgMail className="w-[20px] h-[20px] hover:bg-[#98a2ae]" />
+            <CgMail className="w-[20px] h-[20px] hover:bg-[#98a2ae] " />
           </li>
         </ul>
       </div>
