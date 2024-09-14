@@ -10,6 +10,7 @@ import BlogPost from '../components/home/BlogPost';
 import { motion } from 'framer-motion';
 //vatiants
 import { fadeIn } from '../variants';
+import { Link } from 'react-router-dom';
 const Home = () => {
   return (
     <div>
@@ -50,7 +51,9 @@ const Home = () => {
               viewport={{ once: false, amount: 0.7 }}
             >
               <div className="px-5 py-5">
-                <img src="./images/room1.jpg" alt="" className="w-[350px] h-[250px] rounded-[25px]" />
+                <Link to="chi-tiet-phong">
+                  <img src="./images/room1.jpg" alt="" className="w-[350px] h-[250px] rounded-[25px]" />
+                </Link>
                 <div className="relative flex items-center bg-yellow-500 w-[150px] rounded-xl justify-center top-[-240px] left-2">
                   <CiStar />
                   <h2 className="text-[13px] md:text-[15px] ml-2">4.9 (11) đánh giá</h2>

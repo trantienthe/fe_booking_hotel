@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaPhoneAlt } from 'react-icons/fa';
 import { IoMenu } from 'react-icons/io5';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,7 +12,9 @@ const Header = () => {
     <div className="border-b-2 sticky top-0 bg-white z-[99999999] px-10">
       <div className="flex justify-between h-[100px]">
         <div className="flex items-center w-[200px]">
-          <img src="./images/logohavenhotel.png" alt="" className="w-[160px] h-[100px]" />
+          <Link to="/">
+            <img src="./images/logohavenhotel.png" alt="" className="w-[160px] h-[100px]" />
+          </Link>
         </div>
         <div className="flex gap-10 font-semibold text-[15px]">
           <p className="flex justify-center items-center hover:text-[#77dada] hidden md:flex">bookinghotel@gmail.com</p>
@@ -23,9 +26,11 @@ const Header = () => {
         </div>
         {/* Menu đăng ký đăng nhập */}
         <div className="hidden sm:flex gap-5 items-center">
-          <div className="w-[130px] h-[40px] border-2 border-blue-400 rounded-[10px] flex items-center justify-center text-[15px] text-red-900 font-bold hover:bg-pink-200">Đăng Nhập</div>
+          <div className="w-[130px] h-[40px] border-2 border-blue-400 rounded-[10px] flex items-center justify-center text-[15px] text-red-900 font-bold hover:bg-pink-200">
+            <Link to="/login">Đăng Nhập</Link>
+          </div>
           <div className="w-[130px] h-[40px] border-2 border-blue-400 rounded-[10px] flex items-center justify-center text-[15px] text-white bg-blue-400 font-bold hover:text-red-900 hover:bg-blue-500">
-            Đăng Ký
+            <Link to="/register">Đăng Ký</Link>
           </div>
         </div>
 
