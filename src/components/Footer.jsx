@@ -2,10 +2,19 @@ import React from 'react';
 import { CgMail } from 'react-icons/cg';
 import { FaFacebookSquare } from 'react-icons/fa';
 import { FaSquareInstagram } from 'react-icons/fa6';
+import { motion } from 'framer-motion';
+//vatiants
+import { fadeIn } from '../variants';
 
 const Footer = () => {
   return (
-    <div className="text-white bg-[#101828] px-[80px] py-10 md:grid sm:grid-cols-2 md:grid-cols-4">
+    <motion.div
+      variants={fadeIn('up', 0.2)}
+      initial="hidden"
+      whileInView={'show'}
+      viewport={{ once: false, amount: 0.7 }}
+      className="text-white bg-[#101828] px-[80px] py-10 md:grid sm:grid-cols-2 md:grid-cols-4"
+    >
       <div className="text-[16px] md:text-[14px] sm:text-[13px] md1:mt-5">
         <img src="./images/logohavenhotel.png" alt="" className="w-[150px] h-[100px] bg-white" />
         <div className="mt-2">Công ty TNHH Du Lịch và Dịch Vụ</div>
@@ -46,7 +55,7 @@ const Footer = () => {
           </li>
         </ul>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
