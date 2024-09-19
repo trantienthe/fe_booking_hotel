@@ -4,6 +4,9 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import RoomDetail from './pages/RoomDetail';
+import AllRoom from './pages/AllRoom';
+import About from './pages/About';
+import AboutBranch from './pages/AboutBranch';
 
 export const mainRouters = [
   {
@@ -12,8 +15,23 @@ export const mainRouters = [
     layout: MainLayout,
   },
   {
+    path: '/gioi-thieu',
+    component: About,
+    layout: MainLayout,
+  },
+  {
+    path: '/gioi-thieu-chi-nhanh',
+    component: AboutBranch,
+    layout: MainLayout,
+  },
+  {
     path: '/chi-tiet-phong',
     component: RoomDetail,
+    layout: MainLayout,
+  },
+  {
+    path: '/tim-phong-khach-san',
+    component: AllRoom,
     layout: MainLayout,
   },
   {
