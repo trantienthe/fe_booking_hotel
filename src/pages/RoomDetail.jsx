@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import { fadeIn } from '../variants';
-import { CiLocationOn, CiStar } from 'react-icons/ci';
-import { IoBedOutline } from 'react-icons/io5';
 import RoomList from '../components/room/RoomList';
-import Review from '../components/room/Review';
 
 const RoomDetail = () => {
   const images = ['./images/hotel1.jpg', './images/muongthanh_ht.gif', './images/sontra_ht.webp', './images/minhtoan_ht.jpg'];
@@ -103,11 +98,6 @@ const RoomDetail = () => {
               Phòng liên quan
             </a>
           </li>
-          <li>
-            <a href="#reviews" className="hover:bg-white rounded-[10px] px-3 py-2">
-              Đánh giá
-            </a>
-          </li>
         </ul>
       </div>
 
@@ -134,11 +124,6 @@ const RoomDetail = () => {
       {/* Phòng liên quan */}
       <div id="related-rooms" className="px-[30px] md:px-[85px] mt-5">
         <RoomList />
-      </div>
-
-      {/* đánh giá */}
-      <div id="reviews" className="px-[30px] md:px-[85px] mt-5">
-        <Review />
       </div>
     </div>
   );

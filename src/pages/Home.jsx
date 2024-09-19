@@ -84,7 +84,7 @@ const Home = () => {
             viewport={{ once: false, amount: 0.7 }}
             className="flex items-center h-[50px] w-[250px] bg-white border-2 border-pink-200 justify-center rounded-[30px] hover:bg-red-500"
           >
-            <h2>Xem tất cả phòng</h2>
+            <Link to="/tim-phong-khach-san">Xem tất cả phòng</Link>
             <FaRegArrowAltCircleRight className="ml-3" />
           </motion.button>
         </div>
@@ -109,7 +109,7 @@ const Home = () => {
             viewport={{ once: false, amount: 0.7 }}
             className="text-[18px] text-wrap font-archivo font-medium mt-10 md:w-[800px] md:pl-[250px]"
           >
-            Khách hàng chia sẻ về những kỷ niệm tuyệt vời trên chuyến du lịch với chúng tôi.
+            Khách hàng chia sẻ về những kỷ niệm tuyệt vời khi đến với chúng tôi.
           </motion.p>
         </div>
         <motion.img
