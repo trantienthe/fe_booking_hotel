@@ -1,28 +1,26 @@
+import axios from 'axios';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
-    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState({
-    username: false,
     email: false,
     password: false,
-    confirmPassword: false,
   });
+
+  const navigate = useNavigate(); // Hook để điều hướng
 
   const validateForm = () => {
     let valid = true;
     const newErrors = {
-      username: !formData.username,
       email: !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email),
       password: !formData.password,
-      confirmPassword: formData.password !== formData.confirmPassword,
     };
 
     setErrors(newErrors);
@@ -33,11 +31,44 @@ const Login = () => {
     return valid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      alert('Form submitted successfully!');
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/login/', {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        // Lưu các token vào localStorage
+        localStorage.setItem('accessToken', response.data.access);
+        localStorage.setItem('refreshToken', response.data.refresh);
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Thành công!',
+          text: 'Đăng nhập thành công!',
+          confirmButtonText: 'OK',
+        });
+
+        navigate('/', {
+          state: {
+            notify: {
+              type: 'success',
+              message: 'Xin chào bạn',
+            },
+          },
+        });
+      } catch (error) {
+        setErrors({ ...errors, password: true });
+        await Swal.fire({
+          icon: 'error',
+          title: 'Lỗi',
+          text: error.response?.data?.detail || 'Thông tin đăng nhập không hợp lệ',
+          confirmButtonText: 'OK',
+        });
+      }
     }
   };
 
@@ -47,6 +78,7 @@ const Login = () => {
       [e.target.id]: e.target.value,
     });
   };
+
   return (
     <div className="bg-gradient-to-r from-blue-400 to-red-200 flex items-center justify-center min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
@@ -56,7 +88,7 @@ const Login = () => {
           </Link>
         </div>
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Đăng nhập</h2>
-        <form id="registrationForm" onSubmit={handleSubmit} noValidate>
+        <form id="loginForm" onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">
               Email
@@ -93,7 +125,7 @@ const Login = () => {
           </button>
         </form>
         <p className="text-center text-gray-600 mt-4">
-          Bạn chưa có tài khoản ?{' '}
+          Bạn chưa có tài khoản?{' '}
           <Link to="/register" className="text-blue-500 font-semibold">
             Đăng ký
           </Link>

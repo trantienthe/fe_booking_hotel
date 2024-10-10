@@ -5,7 +5,7 @@ import { IoBedOutline } from 'react-icons/io5';
 const rooms = [
   {
     id: 1,
-    image: './images/room1.jpg',
+    image: '/images/room1.jpg',
     rating: '4.9 (11)',
     location: 'Hải Châu, Đà Nẵng',
     title: 'Phòng Vip 0001 Galaxay 2 Giường cực đẹp siêu siêu đẹp',
@@ -13,7 +13,7 @@ const rooms = [
   },
   {
     id: 2,
-    image: './images/room1.jpg',
+    image: '/images/room1.jpg',
     rating: '4.8 (9)',
     location: 'Sơn Trà, Đà Nẵng',
     title: 'Phòng Deluxe view biển sang trọng tuyệt vời',
@@ -21,7 +21,7 @@ const rooms = [
   },
   {
     id: 3,
-    image: './images/room1.jpg',
+    image: '/images/room1.jpg',
     rating: '4.7 (15)',
     location: 'Hội An, Quảng Nam',
     title: 'Phòng Suite lãng mạn tại Hội An',
@@ -29,7 +29,7 @@ const rooms = [
   },
   {
     id: 4,
-    image: './images/room1.jpg',
+    image: '/images/room1.jpg',
     rating: '5.0 (20)',
     location: 'Mỹ Khê, Đà Nẵng',
     title: 'Phòng Studio phong cách hiện đại',
@@ -41,7 +41,7 @@ const RoomList = () => {
   return (
     <div className="px-6 md:px-20 mt-20">
       <h2 className="text-xl md:text-3xl font-archivo font-bold">Phòng liên quan</h2>
-      <img src="./images/heading-border.webp" alt="" className="mt-5" />
+      <img src="/images/heading-border.webp" alt="" className="mt-5" />
       <div className="mt-5">
         <div className="md:mt-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

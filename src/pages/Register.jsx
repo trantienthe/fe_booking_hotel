@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
 
   const [errors, setErrors] = useState({
-    username: false,
+    firstName: false,
+    lastName: false,
     email: false,
     password: false,
     confirmPassword: false,
@@ -19,7 +23,8 @@ const Register = () => {
   const validateForm = () => {
     let valid = true;
     const newErrors = {
-      username: !formData.username,
+      firstName: !formData.firstName,
+      lastName: !formData.lastName,
       email: !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email),
       password: !formData.password,
       confirmPassword: formData.password !== formData.confirmPassword,
@@ -33,11 +38,61 @@ const Register = () => {
     return valid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      alert('Form submitted successfully!');
+      const userData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/user/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          Swal.fire({
+            icon: 'success',
+            title: 'Đăng ký thành công!',
+            text: 'Chúc mừng bạn đã đăng ký tài khoản thành công.',
+            timer: 3000,
+            timerProgressBar: true,
+            willClose: () => {
+              navigate('/', {
+                state: {
+                  notify: {
+                    type: 'success',
+                    message: 'Đăng ký thành công!',
+                  },
+                },
+              });
+            },
+          });
+        } else {
+          const errorData = await response.json();
+          Swal.fire({
+            icon: 'error',
+            title: 'Đăng ký thất bại!',
+            text: errorData.detail || 'Có lỗi xảy ra.',
+          });
+        }
+      } catch (error) {
+        console.error('Đã có lỗi xảy ra:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Có lỗi xảy ra!',
+          text: 'Vui lòng thử lại sau.',
+        });
+      }
     }
   };
 
@@ -59,19 +114,34 @@ const Register = () => {
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Tạo tài khoản</h2>
         <form id="registrationForm" onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">
-              Họ và tên
+            <label htmlFor="firstName" className="block text-gray-700 font-semibold mb-2">
+              Họ
             </label>
             <input
               type="text"
-              id="username"
-              value={formData.username}
+              id="firstName"
+              value={formData.firstName}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Nhập đầy đủ họ và tên"
+              placeholder="Nhập họ"
               required
             />
-            {errors.username && <p className="text-red-500 text-sm mt-2">Không thể để trống.</p>}
+            {errors.firstName && <p className="text-red-500 text-sm mt-2">Không thể để trống.</p>}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="lastName" className="block text-gray-700 font-semibold mb-2">
+              Tên
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Nhập tên"
+              required
+            />
+            {errors.lastName && <p className="text-red-500 text-sm mt-2">Không thể để trống.</p>}
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">
@@ -93,6 +163,7 @@ const Register = () => {
               Mật khẩu
             </label>
             <input
+              autoComplete=""
               type="password"
               id="password"
               value={formData.password}

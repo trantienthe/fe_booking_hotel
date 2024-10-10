@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CiLocationOn, CiStar } from 'react-icons/ci';
 import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import { IoBedOutline } from 'react-icons/io5';
+
+//components
 import Slider from '../components/home/Slider';
 import Banner from '../components/home/Banner';
 import Adress from '../components/home/Adress';
@@ -10,8 +12,27 @@ import BlogPost from '../components/home/BlogPost';
 import { motion } from 'framer-motion';
 //vatiants
 import { fadeIn } from '../variants';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
 const Home = () => {
+  const [rooms, setRooms] = useState([]);
+
+  //Phòng khách sạn mới và phổ biến nhất
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/room/');
+        const data = await response.json();
+        setRooms(data); // Cập nhật state với dữ liệu nhận được
+        // console.log(data);
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+      }
+    };
+
+    fetchRooms();
+  }, []);
   return (
     <div>
       {/* Bạn lựa chọn đặt phòng khách sạn nào? */}
@@ -40,7 +61,7 @@ const Home = () => {
           </motion.p>
         </div>
         {/* room hotel */}
-        <div className="mt-20 sm:grid sm:grid-cols-2 md0:grid-cols-3 justify-items-center gap-y-5">
+        {/* <div className="mt-20 sm:grid sm:grid-cols-2 md0:grid-cols-3 justify-items-center gap-y-5">
           {Array.from({ length: 6 }).map((_, index) => (
             <motion.div
               key={index}
@@ -69,6 +90,44 @@ const Home = () => {
                 </div>
                 <div className="flex justify-between mt-5">
                   <h2 className="text-[18px] md:text-[22px]">3,675,000đ / Ngày</h2>
+                  <button className="h-[40px] w-[150px] bg-gray-300 rounded-[30px] hover:bg-red-500 font-archivo font-bold">Đặt ngay</button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div> */}
+
+        <div className="mt-20 sm:grid sm:grid-cols-2 md:grid-cols-3 justify-items-center gap-y-5">
+          {rooms.map((room) => (
+            <motion.div
+              key={room.room_id}
+              className="mt-5 border-2 rounded-[30px] w-[350px] flex justify-center"
+              variants={fadeIn('up', 0.2)}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: false, amount: 0.7 }}
+            >
+              <div className="px-5 py-5">
+                <Link to={`/chi-tiet-phong/${room.room_id}`}>
+                  <img src={room.thumbnail} alt={room.description} className="w-[350px] h-[250px] rounded-[25px]" />
+                </Link>
+                <div className="relative flex items-center bg-yellow-500 w-[150px] rounded-xl justify-center top-[-240px] left-2">
+                  <CiStar />
+                  <h2 className="text-[13px] md:text-[15px] ml-2">{room.hotel.rating} (11) đánh giá</h2>
+                </div>
+                <div className="flex items-center bg-pink-200 w-[200px] rounded-xl justify-center">
+                  <CiLocationOn />
+                  <h2>
+                    {room.area.name}, {room.hotel.address}
+                  </h2>
+                </div>
+                <div className="mt-5 text-[20px] font-archivo font-semibold">{room.room_type}</div>
+                <div className="flex items-center mt-3">
+                  <IoBedOutline />
+                  <h2 className="text-[14px] md:text-[16px] ml-2">Giường đôi</h2>
+                </div>
+                <div className="flex justify-between mt-5">
+                  <h2 className="text-[18px] md:text-[22px]">{room.price_per_night}đ / Ngày</h2>
                   <button className="h-[40px] w-[150px] bg-gray-300 rounded-[30px] hover:bg-red-500 font-archivo font-bold">Đặt ngay</button>
                 </div>
               </div>

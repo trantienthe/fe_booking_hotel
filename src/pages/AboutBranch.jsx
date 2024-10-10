@@ -29,7 +29,7 @@ const AboutBranch = () => {
           Chi Nhánh Hải Châu
           <PiCrownThin />
         </h2>
-        <div className=" flex items-center justify-center mt-3">
+        <div className="flex items-center justify-center mt-3">
           <p className="w-[120px] h-[25px] px-5 bg-blue-200 flex items-center justify-center rounded-xl">Khách sạn</p>
         </div>
         <p className="text-[24px] text-yellow-300 flex items-center justify-center mt-3">★★★★★</p>
