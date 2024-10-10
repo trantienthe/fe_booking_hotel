@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { mainRouters } from './router';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (

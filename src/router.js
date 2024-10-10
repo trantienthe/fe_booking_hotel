@@ -7,8 +7,14 @@ import RoomDetail from './pages/RoomDetail';
 import AllRoom from './pages/AllRoom';
 import About from './pages/About';
 import AboutBranch from './pages/AboutBranch';
+import Cart from './pages/Cart';
 
 export const mainRouters = [
+  {
+    path: '/gio-hang',
+    component: Cart,
+    layout: MainLayout,
+  },
   {
     path: '/',
     component: Home,
@@ -25,7 +31,7 @@ export const mainRouters = [
     layout: MainLayout,
   },
   {
-    path: '/chi-tiet-phong',
+    path: '/chi-tiet-phong/:roomId',
     component: RoomDetail,
     layout: MainLayout,
   },
