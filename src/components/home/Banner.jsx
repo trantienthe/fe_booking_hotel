@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import { IoLocationOutline } from 'react-icons/io5';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
@@ -12,15 +12,29 @@ const Banner = () => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
 
-  const locations = ['Hải Châu', 'Sơn Trà', 'Hòa Khánh'];
+  const [locations, setLocations] = useState([]);
   const prices = ['Dưới 1 triệu', '1 triệu - 2 triệu', 'Trên 2 triệu'];
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/hotels/');
+        const data = await response.json();
+        const locationNames = data.map((hotel) => hotel.address);
+        setLocations(locationNames);
+      } catch (error) {
+        console.error('Error fetching hotel locations:', error);
+      }
+    };
+    fetchLocations();
+  }, []);
 
   return (
     <div className="flex flex-col items-center md:mr-10 md:ml-10 bg-bg-image-1 bg-contain md:bg-bg-white pb-6">
       <div className="hidden md:block w-full rounded-[50px] h-[580px] overflow-hidden">
         <video src="./videos/hotel1.mp4" autoPlay loop muted className="w-full h-full object-cover"></video>
       </div>
-      <motion.div
+      <div
         variants={fadeIn('down', 0.2)}
         initial="hidden"
         whileInView={'show'}
@@ -105,7 +119,7 @@ const Banner = () => {
             <div className="text-[13px] sm0:mt-2 pl-10 w-full h-[50px] border-2 rounded-[30px] flex items-center bg-red-100 hover:bg-red-300 sm:w-[140px] md0:w-[230px]">Tìm kiếm</div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

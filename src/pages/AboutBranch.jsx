@@ -2,23 +2,27 @@ import React, { useEffect, useState } from 'react';
 import Review from '../components/room/Review';
 import { IoArrowRedo, IoLocationOutline } from 'react-icons/io5';
 import { PiCrownThin } from 'react-icons/pi';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const AboutBranch = () => {
-  // Mảng chứa các ảnh
-  const images = ['./images/room1.jpg', './images/hotel1.jpg', './images/logodep.jpg'];
+  const { hotelId } = useParams();
+  const [hotel, setHotel] = useState(null);
+  const [rooms, setRooms] = useState([]);
 
-  // State để lưu chỉ số ảnh hiện tại
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // useEffect để tự động thay đổi ảnh mỗi 3 giây
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // 3000 ms = 3 giây
+    axios
+      .get(`http://127.0.0.1:8000/hotels/${hotelId}`)
+      .then((response) => setHotel(response.data))
+      .catch((error) => console.error('Error fetching hotel data', error));
 
-    // Cleanup interval khi component bị unmount
-    return () => clearInterval(intervalId);
-  }, [images.length]);
+    axios
+      .get(`http://127.0.0.1:8000/hotels/${hotelId}/rooms`)
+      .then((response) => setRooms(response.data))
+      .catch((error) => console.error('Error fetching rooms data', error));
+  }, [hotelId]);
+
+  if (!hotel) return <p>Loading...</p>;
 
   return (
     <div>
@@ -26,7 +30,7 @@ const AboutBranch = () => {
       <div className="mx-[10px] md:mx-[40px] px-[30px] mt-3 md:mt-10 border-2 rounded-[15px] bg-white shadow-xl pb-[30px]">
         <h2 className="text-[18px] md:text-[32px] font-archivo font-bold flex items-center gap-3 mt-5 justify-center text-green-900">
           <PiCrownThin />
-          Chi Nhánh Hải Châu
+          Chi Nhánh {hotel.address}
           <PiCrownThin />
         </h2>
         <div className="flex items-center justify-center mt-3">
@@ -37,22 +41,9 @@ const AboutBranch = () => {
         {/* Mô tả */}
         <div className="mt-5">
           <h2 className="text-[18px] md:text-[22px] px-5 bg-blue-200 flex items-center justify-center rounded-xl text-green-900 font-archivo font-bold">Mô tả</h2>
-          <p className="text-[14px] md:text-[18px] px-5 mt-5">
-            Haven Hotel Chi Nhánh Hải Châu tọa lạc ngay trung tâm quận Hải Châu, một trong những khu vực sầm uất và năng động nhất của thành phố Đà Nẵng. Với vị trí đắc địa, từ đây, quý khách dễ dàng
-            tiếp cận các điểm tham quan nổi tiếng như Cầu Rồng, sông Hàn, và các khu mua sắm, giải trí.{' '}
-          </p>
-          <p className="text-[14px] md:text-[18px] px-5 mt-3">
-            Haven Hotel Hải Châu không chỉ mang đến cho quý khách không gian nghỉ dưỡng thoải mái mà còn được thiết kế hiện đại, sang trọng, phù hợp với cả khách du lịch và doanh nhân. Khách sạn cung
-            cấp đầy đủ các tiện nghi cao cấp như hồ bơi, nhà hàng, phòng gym, cùng các dịch vụ chăm sóc khách hàng chuyên nghiệp.{' '}
-          </p>
-          <p className="text-[14px] md:text-[18px] px-5 mt-3">
-            Dù quý khách đang tìm kiếm một nơi nghỉ ngơi lý tưởng sau những chuyến đi dài hay một không gian thuận tiện cho các sự kiện doanh nghiệp, Haven Hotel Chi Nhánh Hải Châu đều sẵn sàng mang
-            đến những trải nghiệm tuyệt vời, đáp ứng mọi nhu cầu của quý khách.
-          </p>
+          <p className="text-[14px] md:text-[18px] px-5 mt-5">{hotel.description}</p>
           {/* ảnh */}
-          <div className="mt-5 flex justify-center pb-5">
-            <img src={images[currentImageIndex]} alt="" className=" w-full h-auto md:w-[1000px] md:h-[500px]" />
-          </div>
+          <div className="mt-5 flex justify-center pb-5">{/* <img src={images[currentImageIndex]} alt="" className=" w-full h-auto md:w-[1000px] md:h-[500px]" /> */}</div>
         </div>
 
         <div className="sm1:flex sm1:justify-between gap-[30px] mt-5">
@@ -63,27 +54,27 @@ const AboutBranch = () => {
             </div>
             <div className="w-full grid md:grid-cols-2 mx-[80px]">
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/maylanh.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/maylanh.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin sm:w-[100px]">Máy lạnh</h2>
               </div>
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/wifi.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/wifi.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin w-[100px]">Wifi</h2>
               </div>
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/letan.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/letan.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin w-[100px]">Lễ tân 24h</h2>
               </div>
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/hoboi.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/hoboi.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin w-[100px]">Hồ Bơi</h2>
               </div>
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/thangmay.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/thangmay.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin w-[100px]">Thang máy</h2>
               </div>
               <div className="flex items-center gap-5 mt-5">
-                <img src="./images/svg/an.svg" alt="" className="w-[20px] h-[20px]" />
+                <img src="/images/svg/an.svg" alt="" className="w-[20px] h-[20px]" />
                 <h2 className="text-[14px] md:text-[18px] font-archivo font-thin w-[100px]">Ăn</h2>
               </div>
             </div>

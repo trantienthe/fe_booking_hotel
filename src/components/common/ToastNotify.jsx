@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Bounce, toast, ToastContainer } from 'react-toastify';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ToastNotify = () => {
   const options = {
@@ -16,19 +16,28 @@ const ToastNotify = () => {
   };
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.state && location.state.notify) {
-      const { notify } = location.state;
-      toast[notify.type](notify.message, { ...options, ...notify.options });
+    const { notify } = location.state || {}; // Lấy thông tin notify từ location.state hoặc gán giá trị rỗng nếu không có
 
-      const newLocationState = { ...location.state };
-      delete newLocationState.notify;
-      location.state = newLocationState;
+    if (notify) {
+      toast[notify.type](notify.message, options); // Hiện thông báo toast với loại và thông điệp đã chỉ định
+
+      // Xóa trạng thái notify sau khi hiển thị thông báo
+      const newLocationState = { ...location.state }; // Tạo một bản sao của location.state
+      delete newLocationState.notify; // Xóa trường notify
+
+      // Sử dụng navigate để cập nhật vị trí mà không làm mới trang
+      navigate(location.pathname, { state: newLocationState }); // Chuyển hướng đến đường dẫn hiện tại với trạng thái mới
     }
-  }, [location]);
+  }, [location, navigate]); // Thêm navigate vào danh sách phụ thuộc
 
-  return <ToastContainer />;
+  return (
+    <div className="relative z-[9999999999999999]">
+      <ToastContainer style={{ top: '100px' }} />
+    </div>
+  );
 };
 
 export default ToastNotify;

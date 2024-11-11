@@ -8,7 +8,7 @@ import { fadeIn } from '../variants';
 
 const Footer = () => {
   return (
-    <motion.div
+    <div
       variants={fadeIn('up', 0.2)}
       initial="hidden"
       whileInView={'show'}
@@ -55,7 +55,7 @@ const Footer = () => {
           </li>
         </ul>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

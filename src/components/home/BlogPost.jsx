@@ -8,7 +8,7 @@ const BlogPost = () => {
   return (
     <div className="px-4 md:px-[100px] pb-20 pt-5">
       <div className="md:flex md:px-[50px] mt-5">
-        <motion.h2
+        <h2
           variants={fadeIn('right', 0.2)}
           initial="hidden"
           whileInView={'show'}
@@ -16,8 +16,8 @@ const BlogPost = () => {
           className="text-[32px] md:text-[36px] font-archivo font-bold md:w-[500px] md:mt-6"
         >
           Bài viết: Khám phá Sự đặc sắc và Cập nhật tin tức mới nhất
-        </motion.h2>
-        <motion.p
+        </h2>
+        <p
           variants={fadeIn('left', 0.2)}
           initial="hidden"
           whileInView={'show'}
@@ -25,18 +25,10 @@ const BlogPost = () => {
           className="text-[18px] text-wrap font-archivo font-medium mt-10 md:w-[800px] md:pl-[250px]"
         >
           Mang lại cho khách hàng các thông tin hữu ích.
-        </motion.p>
+        </p>
       </div>
-      <motion.img
-        variants={fadeIn('right', 0.2)}
-        initial="hidden"
-        whileInView={'show'}
-        viewport={{ once: false, amount: 0.7 }}
-        src="./images/heading-border.webp"
-        alt=""
-        className="md:px-[50px] mt-5"
-      />
-      <motion.div variants={fadeIn('down', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} className="mx-[20px] md:mx-[30px] md:mt-10">
+      <img variants={fadeIn('right', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} src="./images/heading-border.webp" alt="" className="md:px-[50px] mt-5" />
+      <div variants={fadeIn('down', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} className="mx-[20px] md:mx-[30px] md:mt-10">
         <div className="px-5 grid grid-cols-1 sm:grid-cols-2 mds:grid-cols-4 gap-[20px]">
           {/* Các thẻ bài viết */}
           <div className="border-2 rounded-[30px] flex flex-col p-5">
@@ -70,7 +62,7 @@ const BlogPost = () => {
             <FaRegArrowAltCircleRight className="ml-3" />
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
