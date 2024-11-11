@@ -14,18 +14,22 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../variants';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import axios from 'axios';
+import ModalCart from './ModalCart';
+import { getUserId } from '../utils/jwt';
+import { toast } from 'react-toastify';
 
 const Home = () => {
   const [rooms, setRooms] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState('');
 
   //Phòng khách sạn mới và phổ biến nhất
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/room/');
-        const data = await response.json();
-        setRooms(data); // Cập nhật state với dữ liệu nhận được
-        // console.log(data);
+        const response = await axios.get('http://127.0.0.1:8000/room/');
+        setRooms(response.data); // Update state with fetched data
       } catch (error) {
         console.error('Error fetching rooms:', error);
       }
@@ -33,6 +37,48 @@ const Home = () => {
 
     fetchRooms();
   }, []);
+
+  // Thêm phòng vào giỏ hàng
+  const handleAddToCart = async (roomId, checkinDate, checkoutDate, room_name, room_status) => {
+    try {
+      const cartResponse = await axios.get('http://127.0.0.1:8000/cart/');
+      const cartItems = cartResponse.data?.filter((item) => item.user_id === getUserId());
+
+      const isRoomInCart = cartItems.some((item) => item.room === roomId);
+
+      if (isRoomInCart) {
+        alert('Phòng này đã có trong giỏ hàng!');
+        return; // Stop further execution if the room is already in the cart
+      }
+
+      const response = await axios.post('http://127.0.0.1:8000/cart/', {
+        room: roomId,
+        checkin_date: checkinDate,
+        checkout_date: checkoutDate,
+        user_id: getUserId(),
+        room_name: room_name,
+      });
+
+      if (response.status === 201) {
+        toast.success('Phòng đã được thêm vào giỏ hàng!');
+      } else {
+        toast.error('Có lỗi xảy ra khi thêm phòng vào giỏ hàng!');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi thêm phòng vào giỏ hàng!');
+    }
+    setIsModalOpen(false);
+  };
+
+  const openModal = (roomId) => {
+    setSelectedRoomId(roomId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
       {/* Bạn lựa chọn đặt phòng khách sạn nào? */}
@@ -41,24 +87,10 @@ const Home = () => {
       {/* Phòng khách sạn mới và phổ biến nhất */}
       <div className="px-4 md:px-[100px]">
         <div className="md:flex md:px-[50px]">
-          <motion.h2
-            variants={fadeIn('right', 0.2)}
-            initial="hidden"
-            whileInView={'show'}
-            viewport={{ once: false, amount: 0.7 }}
-            className="text-[32px] md:text-[36px] font-archivo font-bold md:w-[500px] md:mt-6"
-          >
-            Phòng khách sạn mới và phổ biến nhất
-          </motion.h2>
-          <motion.p
-            variants={fadeIn('left', 0.2)}
-            initial="hidden"
-            whileInView={'show'}
-            viewport={{ once: false, amount: 0.7 }}
-            className="text-[18px] text-wrap font-archivo font-medium mt-10 md:w-[800px] md:pl-[250px]"
-          >
+          <h2 className="text-[32px] md:text-[36px] font-archivo font-bold md:w-[500px] md:mt-6">Phòng khách sạn mới và phổ biến nhất</h2>
+          <p className="text-[18px] text-wrap font-archivo font-medium mt-10 md:w-[800px] md:pl-[250px]">
             Tận hưởng sự xa hoa và đẳng cấp mới nhất và phổ biến nhất. Khám phá một hành trình tuyệt vời đưa bạn vào thế giới của sự sang trọng, tiện nghi và trải nghiệm không thể quên.
-          </motion.p>
+          </p>
         </div>
         {/* room hotel */}
         {/* <div className="mt-20 sm:grid sm:grid-cols-2 md0:grid-cols-3 justify-items-center gap-y-5">
@@ -96,17 +128,9 @@ const Home = () => {
             </motion.div>
           ))}
         </div> */}
-
         <div className="mt-20 sm:grid sm:grid-cols-2 md:grid-cols-3 justify-items-center gap-y-5">
           {rooms.map((room) => (
-            <motion.div
-              key={room.room_id}
-              className="mt-5 border-2 rounded-[30px] w-[350px] flex justify-center"
-              variants={fadeIn('up', 0.2)}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: false, amount: 0.7 }}
-            >
+            <div key={room.room_id} className="mt-5 border-2 rounded-[30px] w-[350px] flex justify-center">
               <div className="px-5 py-5">
                 <Link to={`/chi-tiet-phong/${room.room_id}`}>
                   <img src={room.thumbnail} alt={room.description} className="w-[350px] h-[250px] rounded-[25px]" />
@@ -128,13 +152,14 @@ const Home = () => {
                 </div>
                 <div className="flex justify-between mt-5">
                   <h2 className="text-[18px] md:text-[22px]">{room.price_per_night}đ / Ngày</h2>
-                  <button className="h-[40px] w-[150px] bg-gray-300 rounded-[30px] hover:bg-red-500 font-archivo font-bold">Đặt ngay</button>
+                  <button onClick={() => openModal(room.room_id)} className="h-[40px] w-[150px] bg-[#bfdbfe] rounded-[30px] hover:bg-red-500 font-archivo font-bold">
+                    Thêm giỏ hàng
+                  </button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-        {/* button */}
         <div className="flex justify-center mt-10 pb-10">
           <motion.button
             variants={fadeIn('up', 0.2)}
@@ -143,16 +168,17 @@ const Home = () => {
             viewport={{ once: false, amount: 0.7 }}
             className="flex items-center h-[50px] w-[250px] bg-white border-2 border-pink-200 justify-center rounded-[30px] hover:bg-red-500"
           >
-            <Link to="/tim-phong-khach-san">Xem tất cả phòng</Link>
-            <FaRegArrowAltCircleRight className="ml-3" />
+            <Link to="/tim-phong-khach-san">Xem thêm phòng</Link>
+            <FaRegArrowAltCircleRight />
           </motion.button>
         </div>
+        {isModalOpen && <ModalCart roomId={selectedRoomId} onClose={closeModal} onAddToCart={handleAddToCart} />}
       </div>
 
       {/* Đánh giá từ những người đã trải nghiệm */}
       <div className="bg-bg-home-1 px-4 md:px-[100px] pb-10 pt-5">
         <div className="md:flex md:px-[50px] mt-5">
-          <motion.h2
+          <h2
             variants={fadeIn('right', 0.2)}
             initial="hidden"
             whileInView={'show'}
@@ -160,8 +186,8 @@ const Home = () => {
             className="text-[32px] md:text-[36px] font-archivo font-bold md:w-[500px] md:mt-6"
           >
             Đánh giá từ những người đã trải nghiệm
-          </motion.h2>
-          <motion.p
+          </h2>
+          <p
             variants={fadeIn('left', 0.2)}
             initial="hidden"
             whileInView={'show'}
@@ -169,22 +195,17 @@ const Home = () => {
             className="text-[18px] text-wrap font-archivo font-medium mt-10 md:w-[800px] md:pl-[250px]"
           >
             Khách hàng chia sẻ về những kỷ niệm tuyệt vời khi đến với chúng tôi.
-          </motion.p>
+          </p>
         </div>
-        <motion.img
-          variants={fadeIn('right', 0.2)}
-          initial="hidden"
-          whileInView={'show'}
-          viewport={{ once: false, amount: 0.7 }}
-          src="./images/heading-border.webp"
-          alt=""
-          className="md:px-[50px] mt-5"
-        />
-        <motion.div variants={fadeIn('right', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} className="pt-5 md:flex">
+        <img variants={fadeIn('right', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} src="./images/heading-border.webp" alt="" className="md:px-[50px] mt-5" />
+        <div variants={fadeIn('right', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} className="pt-5 md:flex">
           <img src="./images/nhaykep1.png" alt="" className="md:px-[50px] h-[25px] md:h-[30px]" />
           <Slider />
-        </motion.div>
+        </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && <ModalCart roomId={selectedRoomId} onAddToCart={handleAddToCart} onClose={closeModal} />}
 
       {/* Các điểm đến */}
       <Adress />

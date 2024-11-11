@@ -8,8 +8,14 @@ import AllRoom from './pages/AllRoom';
 import About from './pages/About';
 import AboutBranch from './pages/AboutBranch';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 
 export const mainRouters = [
+  {
+    path: '/thanh-toán',
+    component: Checkout,
+    layout: MainLayout,
+  },
   {
     path: '/gio-hang',
     component: Cart,
@@ -26,7 +32,7 @@ export const mainRouters = [
     layout: MainLayout,
   },
   {
-    path: '/gioi-thieu-chi-nhanh',
+    path: '/gioi-thieu-chi-nhanh/:hotelId',
     component: AboutBranch,
     layout: MainLayout,
   },
