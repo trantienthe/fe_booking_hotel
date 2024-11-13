@@ -4,7 +4,7 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import RoomNotFound from '../components/allRoom/RoomNotFound';
 import RoomFilter from '../components/allRoom/RoomFilter';
 
-const AllRoom = () => {
+const SearcRoom = () => {
   const [sortOption, setSortOption] = useState('Không sắp xếp');
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -130,4 +130,4 @@ const AllRoom = () => {
   );
 };
 
-export default AllRoom;
+export default SearcRoom;
