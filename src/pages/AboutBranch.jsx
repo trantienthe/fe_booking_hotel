@@ -1,9 +1,10 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Review from '../components/room/Review';
 import { IoArrowRedo, IoLocationOutline } from 'react-icons/io5';
 import { PiCrownThin } from 'react-icons/pi';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import AllRooms from '../components/room/AllRooms';
+import Review from '../components/room/Review';
 
 const AboutBranch = () => {
   const { hotelId } = useParams();
@@ -15,11 +16,6 @@ const AboutBranch = () => {
       .get(`http://127.0.0.1:8000/hotels/${hotelId}`)
       .then((response) => setHotel(response.data))
       .catch((error) => console.error('Error fetching hotel data', error));
-
-    axios
-      .get(`http://127.0.0.1:8000/hotels/${hotelId}/rooms`)
-      .then((response) => setRooms(response.data))
-      .catch((error) => console.error('Error fetching rooms data', error));
   }, [hotelId]);
 
   if (!hotel) return <p>Loading...</p>;
@@ -43,7 +39,9 @@ const AboutBranch = () => {
           <h2 className="text-[18px] md:text-[22px] px-5 bg-blue-200 flex items-center justify-center rounded-xl text-green-900 font-archivo font-bold">Mô tả</h2>
           <p className="text-[14px] md:text-[18px] px-5 mt-5">{hotel.description}</p>
           {/* ảnh */}
-          <div className="mt-5 flex justify-center pb-5">{/* <img src={images[currentImageIndex]} alt="" className=" w-full h-auto md:w-[1000px] md:h-[500px]" /> */}</div>
+          <div className="mt-5 flex justify-center pb-5">
+            <img src={hotel?.image} alt={hotel?.hotel_name} className=" w-full h-auto md:w-[1000px] md:h-[700px]" />
+          </div>
         </div>
 
         <div className="sm1:flex sm1:justify-between gap-[30px] mt-5">
@@ -125,6 +123,8 @@ const AboutBranch = () => {
           </div>
         </div>
       </div>
+      {/* Phòng */}
+      <AllRooms hotelId={hotelId} />
       {/* đánh giá */}
       <div id="reviews" className="px-[30px] md:px-[85px] mt-5">
         <Review />

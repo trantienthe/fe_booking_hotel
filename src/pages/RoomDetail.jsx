@@ -3,6 +3,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import RoomList from '../components/room/RoomList';
 import RoomNotFound from '../components/allRoom/RoomNotFound';
+import Adress from '../components/home/Adress';
 
 const RoomDetail = () => {
   const { roomId } = useParams(); // Use useParams to get roomId
@@ -121,6 +122,11 @@ const RoomDetail = () => {
           </li>
           <li>
             <a href="#related-rooms" className="hover:bg-white rounded-[10px] px-3 py-2">
+              Chi nhánh
+            </a>
+          </li>
+          <li>
+            <a href="#related-rooms" className="hover:bg-white rounded-[10px] px-3 py-2">
               Phòng liên quan
             </a>
           </li>
@@ -132,6 +138,15 @@ const RoomDetail = () => {
         <h2 className="text-[22px] md:text-[32px] font-archivo font-bold">Giới thiệu</h2>
         <img src="./images/heading-border.webp" alt="" className="mt-5" />
         <h2 className="text-[14px] md:text-[18px] font-archivo font-extralight mt-5">{roomData.description}</h2>
+      </div>
+
+      {/* Giới thiệu */}
+      <div id="introduction" className="px-[30px] md:px-[85px] mt-5">
+        <h2 className="text-[22px] md:text-[32px] font-archivo font-bold">Chi nhánh</h2>
+        <img src="./images/heading-border.webp" alt="" className="mt-5" />
+        <h2 className="text-[14px] md:text-[18px] font-archivo font-extralight mt-5">
+          <Adress />
+        </h2>
       </div>
 
       {/* Phòng liên quan */}

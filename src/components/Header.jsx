@@ -26,7 +26,7 @@ const Header = () => {
       state: {
         notify: {
           type: 'success',
-          message: 'byeeeeeeeeeeeeeeee',
+          message: 'bye bye',
         },
       },
     });
