@@ -20,17 +20,19 @@ const ModalCart = ({ onClose, onAddToCart, roomId }) => {
         const response = await fetch('http://127.0.0.1:8000/orderDetails/');
         const orders = await response.json();
 
-        // Lọc các ngày đã được đặt
-        const dates = orders.flatMap((order) => {
-          const checkin = new Date(order.checkin_date);
-          const checkout = new Date(order.checkout_date);
-          const bookedDatesArray = [];
-          // Tạo danh sách các ngày trong khoảng từ checkin đến checkout
-          for (let d = checkin; d <= checkout; d.setDate(d.getDate() + 1)) {
-            bookedDatesArray.push(new Date(d).toISOString().split('T')[0]);
-          }
-          return bookedDatesArray;
-        });
+        // Lọc các ngày đã được đặt theo room_id
+        const dates = orders
+          .filter((order) => order.room_id === roomId)
+          .flatMap((order) => {
+            const checkin = new Date(order.checkin_date);
+            const checkout = new Date(order.checkout_date);
+            const bookedDatesArray = [];
+            // Tạo danh sách các ngày trong khoảng từ checkin đến checkout
+            for (let d = checkin; d <= checkout; d.setDate(d.getDate() + 1)) {
+              bookedDatesArray.push(new Date(d).toISOString().split('T')[0]);
+            }
+            return bookedDatesArray;
+          });
 
         setBookedDates(dates);
       } catch (error) {
@@ -40,7 +42,7 @@ const ModalCart = ({ onClose, onAddToCart, roomId }) => {
     };
 
     fetchBookedDates();
-  }, []);
+  }, [roomId]);
 
   const handleAddToCart = async () => {
     if (!checkinDate || !checkoutDate) {

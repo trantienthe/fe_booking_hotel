@@ -40,7 +40,7 @@ const AboutBranch = () => {
           <p className="text-[14px] md:text-[18px] px-5 mt-5">{hotel.description}</p>
           {/* ảnh */}
           <div className="mt-5 flex justify-center pb-5">
-            <img src={hotel?.image} alt={hotel?.hotel_name} className=" w-full h-auto md:w-[1000px] md:h-[700px]" />
+            <img src={hotel?.image} alt={hotel?.hotel_name} className=" w-full h-auto md:w-[800px] md:h-[500px]" />
           </div>
         </div>
 
@@ -127,7 +127,7 @@ const AboutBranch = () => {
       <AllRooms hotelId={hotelId} />
       {/* đánh giá */}
       <div id="reviews" className="px-[30px] md:px-[85px] mt-5">
-        <Review />
+        <Review hotelId={hotelId} />
       </div>
     </div>
   );

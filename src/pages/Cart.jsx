@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getUserId } from '../utils/jwt';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import RoomNotFound from '../components/allRoom/RoomNotFound';
+import { getUserId } from '../utils/jwt';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -16,6 +16,50 @@ const Cart = () => {
   const [newCheckinDate, setNewCheckinDate] = useState('');
   const [newCheckoutDate, setNewCheckoutDate] = useState('');
   const navigate = useNavigate();
+
+  const [checkinDate, setCheckinDate] = useState('');
+  const [checkoutDate, setCheckoutDate] = useState('');
+  const [bookedDates, setBookedDates] = useState([]);
+
+  // Lấy ngày hôm nay
+  const today = new Date();
+  // Tính ngày mai
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+  useEffect(() => {
+    // Gọi API để lấy danh sách các đơn hàng và trích xuất các ngày đã đặt
+    const fetchBookedDates = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/orderDetails/');
+        const orders = await response.json();
+
+        // Lọc các ngày đã được đặt
+        const dates = orders
+          .filter((order) => !selectedCartItem || order.room_id === selectedCartItem.room)
+          .flatMap((order) => {
+            const checkin = new Date(order.checkin_date);
+            const checkout = new Date(order.checkout_date);
+            const bookedDatesArray = [];
+            // Tạo danh sách các ngày trong khoảng từ checkin đến checkout
+            for (let d = checkin; d <= checkout; d.setDate(d.getDate() + 1)) {
+              bookedDatesArray.push(new Date(d).toISOString().split('T')[0]);
+            }
+            return bookedDatesArray;
+          });
+
+        setBookedDates(dates);
+      } catch (error) {
+        console.error('Error fetching booked dates:', error);
+        toast.error('Có lỗi khi tải dữ liệu ngày đã đặt!');
+      }
+    };
+
+    fetchBookedDates();
+  }, [selectedCartItem]);
+
+  const isBooked = (date) => bookedDates.includes(date);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -83,6 +127,18 @@ const Cart = () => {
 
   const handleSaveDates = async () => {
     try {
+      const isDateConflict = bookedDates.some((date) => newCheckinDate === date || newCheckoutDate === date);
+
+      if (isDateConflict) {
+        toast.error('Ngày đã có người đặt trước, vui lòng chọn ngày khác!');
+        return;
+      }
+
+      if (newCheckinDate >= newCheckoutDate) {
+        toast.error('Ngày check-out phải sau ngày check-in!');
+        return;
+      }
+
       const response = await axios.put(`http://127.0.0.1:8000/cart/${selectedCartItem.id}/`, {
         ...selectedCartItem,
         checkin_date: newCheckinDate,
