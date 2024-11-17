@@ -20,12 +20,10 @@ const RoomNotFound = ({ isCartPage }) => {
         </>
       )}
       <div className="flex justify-center mt-5">
-        <div className="flex items-center justify-center gap-2 w-[100px] rounded-[30px] border-2 px-3 py-3 text-[14px] md:text-[18px] hover:bg-red-200">
-          <Link to="/" className="font-bold font-archivo cursor-pointer">
-            OK
-          </Link>
+        <Link to="/" className="flex items-center justify-center gap-2 w-[100px] rounded-[30px] border-2 px-3 py-3 text-[14px] md:text-[18px] hover:bg-red-200">
+          <div className="font-bold font-archivo cursor-pointer">OK</div>
           <IoMdArrowForward className="font-bold" />
-        </div>
+        </Link>
       </div>
     </div>
   );

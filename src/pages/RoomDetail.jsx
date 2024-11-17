@@ -15,7 +15,6 @@ const RoomDetail = () => {
         const response = await fetch(`${process.env.REACT_APP_BASE_API_URL}/room/${roomId}/`);
         const data = await response.json();
         setRoomData(data);
-        console.log('alo', data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -57,10 +56,10 @@ const RoomDetail = () => {
     <div>
       <div className="px-[30px] md:px-[85px]">
         <div className="mt-8 md:flex justify-between">
-          <h2 className="text-[22px] md:text-[32px] font-bold font-archivo w-[80%] break-words text-left md:pr-[100px]"> {roomData.room_type}</h2>
-          <p className="text-[18px] md:text-[32px] font-archivo font-extralight mt-5 md:mt-0 md:w-[20%] md:text-right"> {roomData.price_per_night}</p>
+          <h2 className="text-[22px] md:text-[32px] font-bold font-archivo w-[70%] break-words text-left md:pr-[100px]"> {roomData.room_type}</h2>
+          <p className="text-[18px] md:text-[32px] font-archivo font-extralight mt-5 md:mt-0 md:w-[30%] md:text-right"> {roomData.price_per_night} VNĐ / Ngày</p>
         </div>
-        <div className="mt-5 w-[150px] md:w-[220px] px-5 py-1 rounded-xl bg-red-300 text-center text-white text-[14px] md:text-[18px]">{roomData.hotel.rating} ★ (11 đánh giá)</div>
+        {/* <div className="mt-5 w-[150px] md:w-[220px] px-5 py-1 rounded-xl bg-red-300 text-center text-white text-[14px] md:text-[18px]">{roomData.hotel.rating} ★ (11 đánh giá)</div> */}
         <img src="./images/heading-border.webp" alt="" className="mt-10" />
       </div>
 
@@ -127,7 +126,7 @@ const RoomDetail = () => {
           </li>
           <li>
             <a href="#related-rooms" className="hover:bg-white rounded-[10px] px-3 py-2">
-              Phòng liên quan
+              Phòng nổi bật
             </a>
           </li>
         </ul>
@@ -151,7 +150,9 @@ const RoomDetail = () => {
 
       {/* Phòng liên quan */}
       <div id="related-rooms" className="px-[30px] md:px-[85px] mt-5">
-        <RoomList />
+        <h2 className="text-[22px] md:text-[32px] font-archivo font-bold md:pt-5">Phòng nổi bật</h2>
+        <img src="./images/heading-border.webp" alt="" className="mt-5" />
+        <RoomList roomActiveId={roomId} />
       </div>
     </div>
   );

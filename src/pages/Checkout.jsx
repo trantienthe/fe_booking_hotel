@@ -13,6 +13,8 @@ const Checkout = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [promoCode, setPromoCode] = useState('');
+  const [vouchers, setVouchers] = useState([]);
+  const [discount, setDiscount] = useState(0);
 
   const handleConfirmPayment = async () => {
     if (!fullName || !email || !phoneNumber || !paymentMethod) {
@@ -20,7 +22,11 @@ const Checkout = () => {
       return;
     }
 
-    const totalPrice = cartItems.reduce((total, item) => total + Number(item.total_price), 0);
+    let totalPrice = cartItems.reduce((total, item) => total + Number(item.total_price), 0);
+
+    if (discount > 0) {
+      totalPrice = totalPrice - (totalPrice * discount) / 100;
+    }
 
     const orderData = {
       user: getUserId(),
@@ -60,7 +66,42 @@ const Checkout = () => {
     } else {
       navigate('/gio-hang');
     }
+
+    const fetchVouchers = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/vouchers/');
+        setVouchers(response.data);
+      } catch (error) {
+        console.error('Error fetching vouchers:', error);
+        toast.error('Lỗi khi tải mã khuyến mãi');
+      }
+    };
+
+    fetchVouchers();
   }, [location, navigate]);
+
+  const handlePromoCodeChange = (e) => {
+    const enteredCode = e.target.value.trim();
+    setPromoCode(enteredCode);
+
+    if (!enteredCode) {
+      setDiscount(0);
+      return;
+    }
+
+    const voucher = vouchers.find((v) => v.code === enteredCode);
+
+    if (!voucher) {
+      toast.error('Mã khuyến mãi không tồn tại!');
+      setDiscount(0);
+    } else if (!voucher.is_active || voucher.usage_count <= 0 || new Date() > new Date(voucher.end_date)) {
+      toast.error('Mã khuyến mãi không dùng được!');
+      setDiscount(0);
+    } else {
+      setDiscount(Number(voucher.discount_percentage));
+      toast.success(`Áp dụng mã giảm giá: ${voucher.discount_percentage}%`);
+    }
+  };
 
   return (
     <div className="mb-[30px]">
@@ -106,7 +147,7 @@ const Checkout = () => {
                 placeholder="Nhập mã khuyến mãi (tùy chọn)"
                 className="h-[40px] sm:h-[45px] w-full rounded-[20px] px-5 bg-inherit border-2 border-green-200 mt-5"
                 value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
+                onChange={handlePromoCodeChange}
               />
             </div>
 
@@ -131,7 +172,7 @@ const Checkout = () => {
               ))}
               <div className="mt-5 text-center">
                 <label className="text-[14px] md:text-[16px] font-semibold text-[#14532d]">Tổng tiền:</label>
-                <div className="text-[14px] md:text-[16px] text-gray-700">{cartItems?.reduce((total, item) => total + Number(item.total_price), 0).toLocaleString()} VNĐ</div>
+                <div className="text-[14px] md:text-[16px] text-gray-700">{(cartItems?.reduce((total, item) => total + Number(item.total_price), 0) * (1 - discount / 100)).toLocaleString()} VNĐ</div>
               </div>
             </div>
           </div>

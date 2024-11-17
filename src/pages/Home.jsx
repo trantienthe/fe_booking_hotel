@@ -93,41 +93,6 @@ const Home = () => {
           </p>
         </div>
         {/* room hotel */}
-        {/* <div className="mt-20 sm:grid sm:grid-cols-2 md0:grid-cols-3 justify-items-center gap-y-5">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <motion.div
-              key={index}
-              className="mt-5 border-2 rounded-[30px] w-[350px] flex justify-center"
-              variants={fadeIn('up', 0.2)}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: false, amount: 0.7 }}
-            >
-              <div className="px-5 py-5">
-                <Link to="chi-tiet-phong">
-                  <img src="./images/room1.jpg" alt="" className="w-[350px] h-[250px] rounded-[25px]" />
-                </Link>
-                <div className="relative flex items-center bg-yellow-500 w-[150px] rounded-xl justify-center top-[-240px] left-2">
-                  <CiStar />
-                  <h2 className="text-[13px] md:text-[15px] ml-2">4.9 (11) đánh giá</h2>
-                </div>
-                <div className="flex items-center bg-pink-200 w-[200px] rounded-xl justify-center">
-                  <CiLocationOn />
-                  <h2>Hải Châu, Đà Nẵng</h2>
-                </div>
-                <div className="mt-5 text-[20px] font-archivo font-semibold text-#475467]">Phòng Vip 0001 Galaxay 2 Giường cực đẹp siêu siêu đẹp</div>
-                <div className="flex items-center mt-3">
-                  <IoBedOutline />
-                  <h2 className="text-[14px] md:text-[16px] ml-2">Giường đôi</h2>
-                </div>
-                <div className="flex justify-between mt-5">
-                  <h2 className="text-[18px] md:text-[22px]">3,675,000đ / Ngày</h2>
-                  <button className="h-[40px] w-[150px] bg-gray-300 rounded-[30px] hover:bg-red-500 font-archivo font-bold">Đặt ngay</button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div> */}
         <div className="mt-20 sm:grid sm:grid-cols-2 md:grid-cols-3 justify-items-center gap-y-5">
           {rooms.map((room) => (
             <div key={room.room_id} className="mt-5 border-2 rounded-[30px] w-[350px] flex justify-center">
@@ -208,7 +173,13 @@ const Home = () => {
       {isModalOpen && <ModalCart roomId={selectedRoomId} onAddToCart={handleAddToCart} onClose={closeModal} />}
 
       {/* Các điểm đến */}
-      <Adress />
+      <div className="mt-10 pb-10">
+        <div variants={fadeIn('down', 0.2)} initial="hidden" whileInView={'show'} viewport={{ once: false, amount: 0.7 }} className="mx-5 md:text-center">
+          <h2 className="text-[22px] md:text-[36px] font-archivo font-bold">Các chi nhánh của khách sạn</h2>
+          <p className="text-[14px] md:text-[19px] font-archivo text-green-900 mt-5 md:mt-0">Khám phá vẻ đẹp tuyệt vời của khách sạn: Hành trình đến thiên đường hotel</p>
+        </div>
+        <Adress />
+      </div>
 
       {/* Đối tác */}
       <Partners />

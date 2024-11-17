@@ -4,6 +4,7 @@ import About from './pages/About';
 import AboutBranch from './pages/AboutBranch';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import HistoryDetails from './pages/HistoryDetails';
 import HistoryOrder from './pages/HistoryOrder';
 import Home from './pages/Home';
 import Instruct from './pages/Instruct';
@@ -14,6 +15,11 @@ import SearcRoom from './pages/SearcRoom';
 import Voucher from './pages/Voucher';
 
 export const mainRouters = [
+  {
+    path: '/lịch-sử-chi-tiết/:orderId',
+    component: HistoryDetails,
+    layout: MainLayout,
+  },
   {
     path: '/lịch-sử-đặt-phòng',
     component: HistoryOrder,
