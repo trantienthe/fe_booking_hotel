@@ -7,13 +7,12 @@ const HistoryDetails = () => {
   const [orderDetails, setOrderDetails] = useState([]);
 
   useEffect(() => {
-    // Fetch order details based on the orderId
     axios
       .get(`http://127.0.0.1:8000/orderDetails/`)
       .then((response) => {
-        // Filter the details by order_id
         const filteredDetails = response.data.filter((detail) => detail.order_id === parseInt(orderId));
-        setOrderDetails(filteredDetails); // Store filtered order details in state
+        setOrderDetails(filteredDetails);
+        console.log(response.data.filter((detail) => detail.order_id === parseInt(orderId)));
       })
       .catch((error) => {
         console.error('There was an error fetching the order details!', error);
@@ -55,21 +54,26 @@ const HistoryDetails = () => {
                 </table>
               </div>
 
-              {/* Mobile layout: Cards for each order detail */}
               <div className="block md:hidden">
                 {orderDetails.map((detail) => (
                   <div key={detail.id} className="mb-4 p-4 bg-white rounded-lg shadow-lg border">
-                    <h4 className="text-lg font-semibold">Mã Phòng</h4>
-                    <p>{detail.room_id}</p>
-
-                    <h4 className="text-lg font-semibold">Giá</h4>
-                    <p>{detail.price} VND</p>
-
-                    <h4 className="text-lg font-semibold">Ngày Nhận Phòng</h4>
-                    <p>{detail.checkin_date}</p>
-
-                    <h4 className="text-lg font-semibold">Ngày Trả Phòng</h4>
-                    <p>{detail.checkout_date}</p>
+                    <div className="flex justify-between px-3">
+                      <h4 className="text-[14px] font-archivo font-normal">Mã Phòng</h4>
+                      <p className="text-[14px] font-archivo font-normal">{detail.room_id}</p>
+                    </div>
+                    <div className="flex justify-between px-3">
+                      <h4 className="text-[14px] font-archivo font-normal">Giá</h4>
+                      <p className="text-[14px] font-archivo font-normal">{detail.price} VND</p>
+                    </div>
+                    <div className="flex justify-between px-3">
+                      {' '}
+                      <h4 className="text-[14px] font-archivo font-normal">Ngày Nhận Phòng</h4>
+                      <p className="text-[14px] font-archivo font-normal">{detail.checkin_date}</p>
+                    </div>
+                    <div className="flex justify-between px-3">
+                      <h4 className="text-[14px] font-archivo font-normal">Ngày Trả Phòng</h4>
+                      <p className="text-[14px] font-archivo font-normal">{detail.checkout_date}</p>
+                    </div>
                   </div>
                 ))}
               </div>

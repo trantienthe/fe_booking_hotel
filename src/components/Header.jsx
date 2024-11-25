@@ -126,7 +126,7 @@ const Header = () => {
                       <Link to="/lịch-sử-đặt-phòng">Lịch sử</Link>
                     </div>
                     <div className="text-[14px] font-archivo font-thin mt-5 hover:text-red-400">
-                      <Link to="/hướng-dẫn-đặt-phòng">Giỏ Hàng</Link>
+                      <Link to="/gio-hang">Giỏ Hàng</Link>
                     </div>
                   </div>
                   <div

@@ -1,23 +1,120 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiFilter, CiSearch } from 'react-icons/ci';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import RoomNotFound from '../components/allRoom/RoomNotFound';
 import RoomFilter from '../components/allRoom/RoomFilter';
+import axios from 'axios';
+import Loading from '../components/loading/loading';
 
 const SearcRoom = () => {
   const [sortOption, setSortOption] = useState('Không sắp xếp');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [utilities, setUtilities] = useState([]); // State to store utilities
+  const [selectedUtilities, setSelectedUtilities] = useState([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get('http://127.0.0.1:8000/search/')
+      .then((response) => {
+        setRooms(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('There was an error fetching the rooms!', error);
+        setLoading(false);
+      });
+
+    // Fetch utilities
+    axios
+      .get('http://127.0.0.1:8000/utilities/')
+      .then((response) => {
+        setUtilities(response.data);
+      })
+      .catch((error) => {
+        console.error('There was an error fetching the utilities!', error);
+      });
+  }, []);
 
   const handleSortChange = (option) => {
     setSortOption(option);
     setShowDropdown(false);
   };
 
+  const handleUtilityChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedUtilities((prevSelected) => {
+      if (checked) {
+        return [...prevSelected, value];
+      } else {
+        return prevSelected.filter((utility) => utility !== value);
+      }
+    });
+  };
+
+  const handlePriceRangeChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedPriceRange((prevSelected) => {
+      if (checked) {
+        return [...prevSelected, value];
+      } else {
+        return prevSelected.filter((range) => range !== value);
+      }
+    });
+  };
+
+  const filteredRooms = rooms.filter((room) => {
+    if (selectedUtilities.length === 0) {
+      return true;
+    }
+    return selectedUtilities.every((utility) => room?.utilities?.some((roomUtility) => roomUtility.name === utility));
+  });
+
+  const filteredRoomsByPrice = filteredRooms.filter((room) => {
+    if (selectedPriceRange.length === 0) {
+      return true;
+    }
+
+    const price = parseFloat(room.price_per_night);
+    return selectedPriceRange.some((range) => {
+      switch (range) {
+        case 'under1M':
+          return price < 1000000;
+        case '1to2M':
+          return price >= 1000000 && price <= 2000000;
+        case 'over3M':
+          return price > 3000000;
+        default:
+          return false;
+      }
+    });
+  });
+
+  // Sort after applying filters
+  const sortedRooms = filteredRoomsByPrice.sort((a, b) => {
+    if (sortOption === 'Giá cao xuống thấp') {
+      return b.price_per_night - a.price_per_night;
+    } else if (sortOption === 'Giá thấp đến cao') {
+      return a.price_per_night - b.price_per_night;
+    }
+    return 0;
+  });
+
+  if (loading) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <div className="px-[30px] md:px-[85px] mt-5">
-      {/* search */}
+      {/* Search */}
       <div className="pt-5 border-2 px-3 py-5 rounded-[30px] shadow-xl">
-        <h2 className="text-[24px] md:text-[30px] text-center font-bold ">Bạn lựa chọn đặt phòng khách sạn nào?</h2>
+        <h2 className="text-[24px] md:text-[30px] text-center font-bold">Bạn lựa chọn đặt phòng khách sạn nào?</h2>
         <p className="text-[18px] mt-3 md:text-[20px] font-light text-[#101828] text-center">Hơn 100 phòng hạng sang giá tốt đang chờ bạn</p>
         <div className="mt-5 flex justify-center items-center relative">
           <input type="text" className="w-full sm:w-[80%] rounded-[25px] border-2 px-5 h-[40px] md:h-[50px] pr-10" placeholder="Nhập tìm kiếm phòng" />
@@ -25,8 +122,8 @@ const SearcRoom = () => {
         </div>
       </div>
 
-      {/* Kết quả text*/}
-      <h2 className="mt-10 text-[22px] md:text-[32px] font-archivo font-bold">Tìm thấy 100 kết quả</h2>
+      {/* Kết quả text */}
+      <h2 className="mt-10 text-[22px] md:text-[32px] font-archivo font-bold">Tìm thấy {sortedRooms.length} kết quả</h2>
       <img src="./images/heading-border.webp" alt="" className="mt-5" />
 
       {/* Bộ lọc */}
@@ -64,67 +161,53 @@ const SearcRoom = () => {
         </div>
       </div>
 
-      {/* Kết quả*/}
+      {/* Kết quả */}
       <div className="sm:flex justify-between w-full gap-5 mt-5">
         <div className="hidden sm:block sm1:w-[25%] rounded-[30px] border-2">
           <div className="flex px-5 py-5 border-b-2 items-center justify-between">
             <h2 className="text-[16px] md:text-[20px] font-bold">Lọc kết quả</h2>
             <div className="text-[16px] md:text-[18px] font-extralight">Đặt lại</div>
           </div>
-
-          {/* Xếp hạng sao */}
+          {/* Giá tiền */}
           <div className="px-5 py-3">
-            <h2 className="text-[16px] md:text-[20px] font-medium">Xếp hạng sao</h2>
+            <h2 className="text-[16px] md:text-[20px] font-medium">Giá tiền</h2>
             <div className="pt-2">
               <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="1" className="mr-3 transform scale-150 shadow" /> 1 sao
+                <input type="checkbox" name="priceRange" value="under1M" className="mr-3 transform scale-150 shadow" onChange={handlePriceRangeChange} />
+                Dưới 1 triệu
               </label>
               <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="2" className="mr-3 transform scale-150 shadow" /> 2 sao
+                <input type="checkbox" name="priceRange" value="1to2M" className="mr-3 transform scale-150 shadow" onChange={handlePriceRangeChange} />1 - 2 triệu
               </label>
               <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="3" className="mr-3 transform scale-150 shadow" /> 3 sao
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="4" className="mr-3 transform scale-150 shadow" /> 4 sao
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="5" className="mr-3 transform scale-150 shadow" /> 5 sao
+                <input type="checkbox" name="priceRange" value="over3M" className="mr-3 transform scale-150 shadow" onChange={handlePriceRangeChange} />
+                Trên 3 triệu
               </label>
             </div>
           </div>
 
-          {/* tiện ích */}
-          <div className="px-5 py-3 pb-10">
+          {/* Filters */}
+          <div className="px-5 py-3">
             <h2 className="text-[16px] md:text-[20px] font-medium">Tiện ích</h2>
             <div className="pt-2">
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="1" className="mr-3 transform scale-150 shadow" /> Phòng gia đình
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="2" className="mr-3 transform scale-150 shadow" /> Giường đôi
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="3" className="mr-3 transform scale-150 shadow" /> Có tất cả bữa ăn
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="4" className="mr-3 transform scale-150 shadow" /> Phòng có bồn tắm
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="5" className="mr-3 transform scale-150 shadow" /> Nhìn ra biển
-              </label>
-              <label className="block text-[18px] font-archivo font-extralight mt-3">
-                <input type="checkbox" name="rating" value="5" className="mr-3 transform scale-150 shadow" /> Két an toàn
-              </label>
+              {utilities.map((utility) => (
+                <label key={utility.utilities_id} className="block text-[18px] font-archivo font-extralight mt-3">
+                  <input
+                    type="checkbox"
+                    name="utility"
+                    value={utility.name}
+                    className="mr-3 transform scale-150 shadow"
+                    checked={selectedUtilities.includes(utility.name)} // Check if the utility is selected
+                    onChange={handleUtilityChange}
+                  />{' '}
+                  {utility.name}
+                </label>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="sm:w-[75%]">
-          <RoomFilter />
-          <h2 className="mt-5" />
-          <RoomNotFound />
-        </div>
+        <div className="sm:w-[75%]">{filteredRoomsByPrice.length > 0 ? filteredRoomsByPrice.map((room) => <RoomFilter key={room.id} room={room} />) : <RoomNotFound />}</div>
       </div>
     </div>
   );
