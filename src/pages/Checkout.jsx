@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getUserId } from '../utils/jwt';
+import useDebounce from '../hooks/useDebounce';
 
 const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -15,6 +16,8 @@ const Checkout = () => {
   const [promoCode, setPromoCode] = useState('');
   const [vouchers, setVouchers] = useState([]);
   const [discount, setDiscount] = useState(0);
+
+  const debouncedPromoCode = useDebounce(promoCode, 500);
 
   const handleConfirmPayment = async () => {
     if (!fullName || !email || !phoneNumber || !paymentMethod) {
@@ -43,13 +46,33 @@ const Checkout = () => {
     };
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/order/', orderData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      if (paymentMethod === 'zalopay') {
+        const zaloPayResponse = await axios.post('http://127.0.0.1:8000/zalopay/payment-order/', {
+          user: getUserId(),
+          full_name: fullName,
+          email: email,
+          order_id: orderData.order_id,
+          total_price: totalPrice,
+          phone_number: phoneNumber,
+          promo_code: promoCode || '',
+        });
 
-      if (response.status === 201) {
+        const { return_code, return_message, order_url } = zaloPayResponse.data;
+
+        if (return_code === 1) {
+          toast.success('Chuyển hướng đến thanh toán ZaloPay...');
+          window.location.href = order_url;
+        } else {
+          toast.error(`Lỗi ZaloPay: ${return_message}`);
+        }
+      } else {
+        // Xử lý các phương thức thanh toán khác
+        const response = await axios.post('http://127.0.0.1:8000/order/', orderData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
         toast.success('Đặt phòng thành công!');
         setCartItems([]);
         navigate('/');
@@ -66,19 +89,33 @@ const Checkout = () => {
     } else {
       navigate('/gio-hang');
     }
-
-    const fetchVouchers = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/vouchers/');
-        setVouchers(response.data);
-      } catch (error) {
-        console.error('Error fetching vouchers:', error);
-        toast.error('Lỗi khi tải mã khuyến mãi');
-      }
-    };
-
-    fetchVouchers();
   }, [location, navigate]);
+
+  useEffect(() => {
+    if (promoCode) {
+      const fetchVouchers = async () => {
+        try {
+          const response = await axios.get('http://127.0.0.1:8000/vouchers/');
+          setVouchers(response.data);
+          const voucher = response.data.find((v) => v.code === promoCode);
+          if (!voucher) {
+            toast.error('Mã khuyến mãi không tồn tại!');
+            setDiscount(0);
+          } else if (!voucher.is_active || voucher.usage_count <= 0 || new Date() > new Date(voucher.end_date)) {
+            toast.error('Mã khuyến mãi không dùng được!');
+            setDiscount(0);
+          } else {
+            setDiscount(Number(voucher.discount_percentage));
+            toast.success(`Áp dụng mã giảm giá: ${voucher.discount_percentage}%`);
+          }
+        } catch (error) {
+          console.error('Error fetching vouchers:', error);
+          toast.error('Lỗi khi tải mã khuyến mãi');
+        }
+      };
+      fetchVouchers();
+    }
+  }, [debouncedPromoCode]);
 
   const handlePromoCodeChange = (e) => {
     const enteredCode = e.target.value.trim();
@@ -87,19 +124,6 @@ const Checkout = () => {
     if (!enteredCode) {
       setDiscount(0);
       return;
-    }
-
-    const voucher = vouchers.find((v) => v.code === enteredCode);
-
-    if (!voucher) {
-      toast.error('Mã khuyến mãi không tồn tại!');
-      setDiscount(0);
-    } else if (!voucher.is_active || voucher.usage_count <= 0 || new Date() > new Date(voucher.end_date)) {
-      toast.error('Mã khuyến mãi không dùng được!');
-      setDiscount(0);
-    } else {
-      setDiscount(Number(voucher.discount_percentage));
-      toast.success(`Áp dụng mã giảm giá: ${voucher.discount_percentage}%`);
     }
   };
 
@@ -184,22 +208,12 @@ const Checkout = () => {
               <hr className="mt-3" />
               <select className="h-[40px] sm:h-[45px] w-full rounded-[20px] px-5 bg-inherit border-2 border-green-200 mt-5" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
                 <option value="">Chọn phương thức thanh toán</option>
-                <option value="atm">Thanh toán ATM</option>
-                <option value="cash">Thanh toán tiền mặt</option>
+                {/* <option value="atm">Thanh toán ATM</option> */}
+                <option value="Tiền mặt">Thanh toán tiền mặt</option>
+                <option value="postpaid">Thanh toán trả sau</option>
+                {/* <option value="vnpay">Thanh toán VNPay</option> */}
+                <option value="zalopay">Thanh toán Zalo Pay</option>
               </select>
-
-              {paymentMethod === 'atm' && (
-                <div className="atm-details">
-                  {/* ATM Card Details */}
-                  <select className="h-[40px] sm:h-[45px] w-full rounded-[20px] px-5 bg-inherit border-2 border-green-200 mt-5">
-                    <option value="">Chọn ngân hàng</option>
-                    {/* Add actual bank options here */}
-                    <option value="vietcombank">Vietcombank</option>
-                    <option value="viettinbank">Viettinbank</option>
-                  </select>
-                </div>
-              )}
-
               <button className="mt-5 w-full text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded-[20px]" onClick={handleConfirmPayment}>
                 Xác nhận thanh toán
               </button>

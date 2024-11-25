@@ -195,7 +195,7 @@ const Cart = () => {
       ) : error ? (
         <p>{error}</p>
       ) : cartItems.length === 0 ? (
-        <div className="mt-5 px-20">
+        <div className="mt-5 mb-5 px-20">
           <RoomNotFound isCartPage={true} />
         </div>
       ) : (
