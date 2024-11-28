@@ -24,10 +24,9 @@ const RoomList = ({ roomActiveId }) => {
         {featuredRooms.map((room) => (
           <div key={room.id} className="border-2 rounded-2xl flex flex-col p-5 bg-white shadow-md">
             <img src={room.thumbnail} alt={`Room ${room.room_id}`} className="w-full h-[200px] max-w-full rounded-2xl" />
-            <div className="flex items-center bg-pink-200 w-max p-2 rounded-xl">
+            <div className="flex items-center bg-pink-200 w-max p-2 rounded-xl mt-2">
               <CiLocationOn className="text-black" />
               <h2 className="text-sm md:text-base ml-2">
-                {' '}
                 {room.hotel.address}, {room.hotel.city}
               </h2>
             </div>
