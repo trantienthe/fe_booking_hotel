@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { CiLocationOn, CiStar } from 'react-icons/ci';
-import { FaRegArrowAltCircleRight } from 'react-icons/fa';
+import { FaAngellist, FaRegArrowAltCircleRight } from 'react-icons/fa';
 import { IoBedOutline } from 'react-icons/io5';
 
 //components
@@ -29,7 +29,7 @@ const Home = () => {
     const fetchRooms = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/room/');
-        setRooms(response.data); // Update state with fetched data
+        setRooms(response.data.slice(0, 6));
       } catch (error) {
         console.error('Error fetching rooms:', error);
       }
@@ -47,8 +47,8 @@ const Home = () => {
       const isRoomInCart = cartItems.some((item) => item.room === roomId);
 
       if (isRoomInCart) {
-        alert('Phòng này đã có trong giỏ hàng!');
-        return; // Stop further execution if the room is already in the cart
+        toast.error('Phòng này đã có trong giỏ hàng!');
+        return;
       }
 
       const response = await axios.post('http://127.0.0.1:8000/cart/', {
@@ -100,11 +100,11 @@ const Home = () => {
                 <Link to={`/chi-tiet-phong/${room.room_id}`}>
                   <img src={room.thumbnail} alt={room.description} className="w-[350px] h-[250px] rounded-[25px]" />
                 </Link>
-                <div className="relative flex items-center bg-yellow-500 w-[150px] rounded-xl justify-center top-[-240px] left-2">
+                {/* <div className="relative flex items-center bg-yellow-500 w-[150px] rounded-xl justify-center top-[-240px] left-2">
                   <CiStar />
                   <h2 className="text-[13px] md:text-[15px] ml-2">{room.hotel.rating} (11) đánh giá</h2>
-                </div>
-                <div className="flex items-center bg-pink-200 w-[200px] rounded-xl justify-center">
+                </div> */}
+                <div className="flex items-center bg-pink-200 w-[200px] rounded-xl justify-center mt-2">
                   <CiLocationOn />
                   <h2>
                     {room.area.name}, {room.hotel.address}
@@ -112,9 +112,17 @@ const Home = () => {
                 </div>
                 <div className="mt-5 text-[20px] font-archivo font-semibold">{room.room_type}</div>
                 <div className="flex items-center mt-3">
-                  <IoBedOutline />
-                  <h2 className="text-[14px] md:text-[16px] ml-2">Giường đôi</h2>
+                  <FaAngellist />
+                  <h2 className="text-[14px] md:text-[16px] ml-2">
+                    {room.utilities.map((utility, index) => (
+                      <span key={utility.utilities_id}>
+                        {utility.name}
+                        {index < room.utilities.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </h2>
                 </div>
+
                 <div className="flex justify-between mt-5">
                   <h2 className="text-[18px] md:text-[22px]">{room.price_per_night}đ / Ngày</h2>
                   <button onClick={() => openModal(room.room_id)} className="h-[40px] w-[150px] bg-[#bfdbfe] rounded-[30px] hover:bg-red-500 font-archivo font-bold">

@@ -4,16 +4,23 @@ import { useParams } from 'react-router-dom';
 import RoomList from '../components/room/RoomList';
 import RoomNotFound from '../components/allRoom/RoomNotFound';
 import Adress from '../components/home/Adress';
+import ModalCart from './ModalCart';
+import { getUserId } from '../utils/jwt';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const RoomDetail = () => {
-  const { roomId } = useParams(); // Use useParams to get roomId
+  const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_BASE_API_URL}/room/${roomId}/`);
         const data = await response.json();
+        console.log('Dữ liệu phòng:', data);
         setRoomData(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -30,11 +37,15 @@ const RoomDetail = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const handle = () => setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    const interval = window.innerWidth < 640 ? setInterval(handle, 3000) : null;
+    if (images.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, 3000);
 
-    return () => clearInterval(interval);
-  }, [currentIndex]);
+      // Clear interval khi component bị unmounted
+      return () => clearInterval(interval);
+    }
+  }, [images]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
@@ -48,6 +59,47 @@ const RoomDetail = () => {
     setCurrentIndex(index);
   };
 
+  // Thêm phòng vào giỏ hàng
+  const handleAddToCart = async (roomId, checkinDate, checkoutDate, room_name, room_status) => {
+    try {
+      const cartResponse = await axios.get('http://127.0.0.1:8000/cart/');
+      const cartItems = cartResponse.data?.filter((item) => item.user_id === getUserId());
+
+      const isRoomInCart = cartItems.some((item) => item.room === roomId);
+
+      if (isRoomInCart) {
+        toast.error('Phòng này đã có trong giỏ hàng!');
+        return;
+      }
+
+      const response = await axios.post('http://127.0.0.1:8000/cart/', {
+        room: roomId,
+        checkin_date: checkinDate,
+        checkout_date: checkoutDate,
+        user_id: getUserId(),
+        room_name: room_name,
+      });
+
+      if (response.status === 201) {
+        toast.success('Phòng đã được thêm vào giỏ hàng!');
+      } else {
+        toast.error('Có lỗi xảy ra khi thêm phòng vào giỏ hàng!');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi thêm phòng vào giỏ hàng!');
+    }
+    setIsModalOpen(false);
+  };
+
+  const openModal = (roomId) => {
+    setSelectedRoomId(roomId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (!roomData) {
     return <RoomNotFound />;
   }
@@ -56,8 +108,16 @@ const RoomDetail = () => {
     <div>
       <div className="px-[30px] md:px-[85px]">
         <div className="mt-8 md:flex justify-between">
-          <h2 className="text-[22px] md:text-[32px] font-bold font-archivo w-[70%] break-words text-left md:pr-[100px]"> {roomData.room_type}</h2>
-          <p className="text-[18px] md:text-[32px] font-archivo font-extralight mt-5 md:mt-0 md:w-[30%] md:text-right"> {roomData.price_per_night} VNĐ / Ngày</p>
+          <div>
+            <h2 className="text-[16px] md:text-[26px] font-archivo font-thin"> {roomData.room_type}</h2>
+            <p className="text-[16px] md:text-[26px] font-archivo font-thin"> {roomData.price_per_night} VNĐ / Ngày</p>
+          </div>
+          <div className="mt-3 md:mt-0">
+            <button onClick={() => openModal(roomData.room_id)} className="h-[40px] w-[150px] bg-[#bfdbfe] rounded-[30px] hover:bg-red-500 font-archivo font-bold">
+              Thêm giỏ hàng
+            </button>
+            {isModalOpen && <ModalCart roomId={selectedRoomId} onClose={closeModal} onAddToCart={handleAddToCart} />}
+          </div>
         </div>
         {/* <div className="mt-5 w-[150px] md:w-[220px] px-5 py-1 rounded-xl bg-red-300 text-center text-white text-[14px] md:text-[18px]">{roomData.hotel.rating} ★ (11 đánh giá)</div> */}
         <img src="./images/heading-border.webp" alt="" className="mt-10" />
@@ -65,11 +125,11 @@ const RoomDetail = () => {
 
       {/* ảnh phòng */}
       <div className="relative flex mt-10 gap-5 items-center px-[30px] md:px-[30px] hidden sm:flex">
-        <div className="sm:h-[400px] sm:w-[15%] overflow-hidden rounded-l-[50px]">
+        <div className="sm:h-[400px] sm:w-[15%] overflow-hidden rounded-l-[50px] border-pink-100 border-2">
           <img src={process.env.REACT_APP_BASE_API_URL + images[(currentIndex - 1 + images.length) % images.length]} alt="" className="w-full h-full object-cover object-left" />
         </div>
 
-        <div className="sm:w-[80%] sm:h-[400px]">
+        <div className="sm:w-[80%] sm:h-[400px] border-pink-100 border-2">
           <img src={process.env.REACT_APP_BASE_API_URL + images[currentIndex]} alt="" className="w-full h-full object-cover" />
           {/* ảnh con */}
           <div className="relative flex gap-3 justify-center top-[-90px]">
@@ -85,7 +145,7 @@ const RoomDetail = () => {
           </div>
         </div>
 
-        <div className="sm:h-[400px] sm:w-[15%] overflow-hidden rounded-r-[50px]">
+        <div className="sm:h-[400px] sm:w-[15%] overflow-hidden rounded-r-[50px] border-pink-100 border-2">
           <img src={process.env.REACT_APP_BASE_API_URL + images[(currentIndex + 1) % images.length]} alt="" className="w-full h-full object-cover object-right" />
         </div>
 
@@ -107,7 +167,7 @@ const RoomDetail = () => {
       {/* ảnh phòng mobile */}
       <div className="relative flex mt-10 gap-5 items-center px-[30px] md:px-[30px] sm:hidden">
         <div className="sm:w-[80%] sm:h-[400px]">
-          <img src={images[currentIndex]} alt="" className="w-full h-full object-cover rounded-[30px]" />
+          <img src={process.env.REACT_APP_BASE_API_URL + images[currentIndex]} alt="" className=" w-[330px] h-[300px] object-cover rounded-[30px] border-red-200 border-2" />
         </div>
       </div>
 

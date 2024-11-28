@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import { IoLocationOutline } from 'react-icons/io5';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import { motion } from 'framer-motion';
-//vatiants
 import { fadeIn } from '../../variants';
 
 const Banner = () => {
@@ -11,16 +11,21 @@ const Banner = () => {
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
-
+  const [searchQuery, setSearchQuery] = useState('');
   const [locations, setLocations] = useState([]);
-  const prices = ['Dưới 1 triệu', '1 triệu - 2 triệu', 'Trên 2 triệu'];
+  const prices = ['Dưới 1 triệu', '1 triệu - 2 triệu', 'Trên 3 triệu'];
+
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/hotels/');
         const data = await response.json();
-        const locationNames = data.map((hotel) => hotel.address);
+        const locationNames = data.map((hotel) => ({
+          name: hotel.address,
+          hotelId: hotel.hotel_id,
+        }));
         setLocations(locationNames);
       } catch (error) {
         console.error('Error fetching hotel locations:', error);
@@ -28,6 +33,29 @@ const Banner = () => {
     };
     fetchLocations();
   }, []);
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    const priceMapping = {
+      'Dưới 1 triệu': 'under1M',
+      '1 triệu - 2 triệu': '1to2M',
+      'Trên 3 triệu': 'over3M',
+    };
+
+    const priceParam = priceMapping[selectedPrice] || '';
+    let queryParams = `query=${searchQuery}`;
+
+    if (priceParam) {
+      queryParams += `&price=${priceParam}`;
+    }
+
+    navigate(`/tim-phong-khach-san?${queryParams}`);
+  };
+
+  const handleLocationClick = (hotelId) => {
+    navigate(`/gioi-thieu-chi-nhanh/${hotelId}`);
+  };
 
   return (
     <div className="flex flex-col items-center md:mr-10 md:ml-10 bg-bg-image-1 bg-contain md:bg-bg-white pb-6">
@@ -52,6 +80,13 @@ const Banner = () => {
                 type="text"
                 className="pl-10 w-full h-[50px] border-2 rounded-[30px] text-[13px] sm:w-[130px] md:w-[200px] md:text-[15px] md0:text-[16px] md0:w-[230px]"
                 placeholder="Nhập tên phòng"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch(e);
+                  }
+                }}
               />
             </div>
 
@@ -74,11 +109,11 @@ const Banner = () => {
                       key={index}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        setSelectedLocation(location);
-                        setIsLocationOpen(false);
+                        setSelectedLocation(location.name);
+                        handleLocationClick(location.hotelId); // Navigate when location is selected
                       }}
                     >
-                      {location}
+                      {location.name}
                     </li>
                   ))}
                 </ul>
@@ -90,7 +125,7 @@ const Banner = () => {
               <MdOutlineKeyboardArrowDown className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <input
                 type="text"
-                className="text-[13px] pl-10 pr-10 w-full h-[50px] border-2 rounded-[30px] flex items-center cursor-pointer sm:w-[130px] md:w-[200px] md:text-[15px] md0:text-[16px] md0:w-[230px]"
+                className="text-[13px] pl-10 pr-10 w-full h-[50px] border-2 rounded-[30px] flex items-center cursor-pointer sm:w-[130px] md:w-[200px] md:text-[15px] md0:text-[16px] md0:w-[230px] "
                 placeholder="Giá tiền"
                 value={selectedPrice}
                 onClick={() => setIsPriceOpen(!isPriceOpen)}
@@ -116,7 +151,12 @@ const Banner = () => {
             </div>
 
             {/* tìm kiếm */}
-            <div className="text-[13px] sm0:mt-2 pl-10 w-full h-[50px] border-2 rounded-[30px] flex items-center bg-red-100 hover:bg-red-300 sm:w-[140px] md0:w-[230px]">Tìm kiếm</div>
+            <div
+              onClick={handleSearch}
+              className="text-[13px] sm0:mt-2 pl-10 w-full h-[50px] border-2 rounded-[30px] flex items-center bg-red-100 hover:bg-red-300 sm:w-[140px] md0:w-[230px] cursor-pointer"
+            >
+              Tìm kiếm
+            </div>
           </div>
         </div>
       </div>
